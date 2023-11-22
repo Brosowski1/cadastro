@@ -1,0 +1,282 @@
+[20/11 10:27] Arthur Rosal e Marcelo Brosowski: <!DOCTYPE html>
+<!-- alteracao_curso.php -->
+<html lang="pt-br">
+<head>
+    <title>Cadastro de aluno - Alteração</title>
+    <meta charset="utf-8">
+</head>
+<body>
+<?php 
+    include_once "../inc/conectabd.inc.php";
+
+    $id_curso = isset($_GET["id_curso"]) ? $_GET["id_curso"] : null;
+    $ds_curso = isset($_GET["ds_curso"]) ? $_GET["ds_curso"] : null;
+    $nr_carga = isset($_GET["nr_carga_horaria"]) ? $_GET["nr_carga_horaria"] : null;
+    $dt_inicio = isset($_GET["dt_inicio"]) ? $_GET["dt_inicio"] : null;
+
+    if ($id_curso !== null && $ds_curso !== null && $nr_carga !== null) {
+        $query = "UPDATE tb_curso
+                SET ds_curso = '$ds_curso',
+                    nr_carga_horaria = $nr_carga ,
+                    dt_inicio = $dt_inicio
+                WHERE id_curso = $id_curso;";
+
+        if ($result = mysqli_query($link, $query)) {
+            echo "Alteração efetuada com sucesso";
+        } else {
+            echo "Erro na alteração: " . mysqli_error($link);
+        }
+    } else {
+        echo "Parâmetros inválidos.";
+    }
+  
+    // fecha a conexão
+    mysqli_close($link);
+?>  
+<br>
+<a href="consulta_curso.php">Ver cursos cadastrados</a>
+</body>
+</html>
+[20/11 10:27] Arthur Rosal: <html lang="pt-br">
+	<head>
+	  <title>Cadastro de curso</title>
+	  <meta charset="utf-8">
+	</head>
+	<body>
+	<h1>Cadastrar novo curso</h1>
+		<form action="insercao_curso.php" 
+		      method="GET">
+			<label for="id_curso">
+			Curso:
+			</label>
+			<select name="ds_curso" id="id_curso">
+				<option value="Ánalise e desenvolvimento de sistemas">Ánalise e desenvolvimento de sistemas</option>
+				<option value="Gestão de recursos humanos">Gestão de recursos humanos</option>
+				<option value="Gestão comercial">Gestão comercial</option>
+				<option value="Marketing">Marketing</option>
+			</select>
+			<br>
+            <label for="id_curso">
+			Carga horária:
+			</label> 
+			<input type="number" name="nr_carga_horaria" id="carga_horaria">
+			Data do curso:
+			</label> 
+			<input type="datetime" name="dt_inicio" id="inicio">
+			<?php
+                          include_once "../inc/conectabd.inc.php";
+                          include "../inc/funcoes.inc.php";
+                          
+                          
+                        ?>
+			<br>
+			<input type="submit" value="Ok">
+		</form>
+	</body>
+</html>
+[20/11 10:27] Arthur Rosal: <!DOCTYPE html>
+<!-- cadastro.html -->
+<html lang="pt-br">
+	<head>
+	  <title>Cadastro de curso - Exclusão</title>
+	  <meta charset="utf-8">
+	</head>
+	<body><?php //exclusao.php
+// efetua a exclusão do curso cujo id seja informado.
+  $id = $_GET["id"];
+  
+  include_once "../inc/conectabd.inc.php";
+
+  $query = "delete from tb_curso where id_curso = $id;";
+  if ($result = mysqli_query($link, $query)) {
+	  echo "Exclusão efetuada com sucesso";
+  }
+  
+  // fecha a conexão
+  mysqli_close($link);
+  
+ ?>  
+ <br>
+ <a href="consulta_curso.php">Ver cursos cadastrados</a>
+ 
+ </body>
+</html>
+[20/11 10:27] Arthur Rosal: <!DOCTYPE html>
+<?php
+include "../inc/conectabd.inc.php";
+
+function recupera_curso($id){
+    global $link;
+
+    // lista cursos já cadastrados
+    $query = "SELECT id_curso, ds_curso, nr_carga_horaria, dt_inicio FROM tb_curso WHERE id_curso = $id;";
+    if ($result = mysqli_query($link, $query)) {
+        // busca os dados lidos do banco de dados
+        while ($row = mysqli_fetch_assoc($result)) {
+            return $row;
+        }
+
+        // libera a área de memória onde está o resultado
+        mysqli_free_result($result);
+    }
+}
+
+$id = isset($_GET["id"]) ? $_GET["id"] : null;
+$al = recupera_curso($id);
+ ?>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atualizar curso</title>
+</head>
+<body>
+    <h1>Atualizar curso</h1>
+    <form action="alteracao_curso.php" method="GET">
+        <input type="hidden" name="id_curso" value="<?php echo $al["id_curso"];?>">
+        <label for="curso">Curso:</label>
+        <select name="ds_curso" id="curso">
+            <option value="Ánalise e desenvolvimento de sistemas">Ánalise e desenvolvimento de sistemas</option>
+            <option value="Gestão de recursos humanos">Gestão de recursos humanos</option>
+            <option value="Gestão comercial">Gestão comercial</option>
+            <option value="Marketing">Marketing</option>
+        </select>
+        <br>
+        <label for="carga_horaria">Carga horária:</label> 
+        <input type="number" name="nr_carga_horaria" id="carga_horaria">
+        <br>
+        <label for="inicio">Data do curso:</label> 
+        <input type="datetime" name="dt_inicio" id="inicio">
+        <br>
+        <input type="submit" value="OK">
+    </form>
+    <style>
+        input{
+            margin : 4px;
+            padding :2px;
+        }
+        input:hover{
+            background-color : lightgray;
+
+            
+        }
+        label{
+            
+        }
+    </style>
+</body>
+</html>
+[20/11 10:27] Arthur Rosal: <!DOCTYPE html>
+<!-- consulta_curso.php 
+     lista os cursos cadastrados -->
+<html lang="pt-br">
+	<head>
+	  <title>Cadastro de curso</title>
+	  <meta charset="utf-8">
+	  </head>
+	<body>
+
+	<?php //cadastro.php
+// lista cursos cadastrados  
+
+  include_once "../inc/conectabd.inc.php";
+
+  echo "<h1>Cursos Cadastrados</h1>";
+  
+  // lista cursos já cadastrados
+  $query = "SELECT id_curso, ds_curso, nr_carga_horaria, dt_inicio FROM tb_curso;";
+  if ($result = mysqli_query($link, $query)) {
+	  echo "<table border='1' class='tabela'>";
+	  echo '<tr><th>id</th><th>Descrição</th><th>Carga Horária</th><th>Dt.Início</th><th colspan="2">Ações</th></tr>';
+	  // busca os dados lidos do banco de dados
+	  while ($row = mysqli_fetch_assoc($result)) {
+		  $id = $row["id_curso"];
+		  $curso = $row["ds_curso"];
+                  $nr_carga_horaria = $row["nr_carga_horaria"];
+                  $dt_inicio = $row["dt_inicio"];
+                  
+		  echo "<tr>";
+		  echo "<td>" . $id . "</td>";
+		  echo "<td>" . $curso . "</td>";
+                  echo "<td>" . $nr_carga_horaria . "</td>";
+                  echo "<td>" . $dt_inicio . "</td>";
+		  // cria link para EXCLUSAO do respectivo id_curso
+		  echo '<td><a href="exclusao_curso.php?id='. $row["id_curso"] . '">Excluir</a></td>';
+		  // cria link para ALTERACAO do respectivo id_curso
+		  echo '<td><a href="form_alteracao_curso.php?id='. $row["id_curso"] . '&curso='.urlencode($curso).'">Alterar</a></td>';
+		  
+		  echo "</tr>";
+		  // ou
+		  // printf("<tr><td>%s</td><td>%s</td></tr>", $row["id_curso"], $row["ds_curso"] );
+	  }
+	  echo "</table>";
+	  // libera a área de memória onde está o resultado
+	  mysqli_free_result($result);
+  }
+  // fecha a conexão
+  mysqli_close($link);
+?>  
+	<br>
+	<a href="cadastro_curso.php">Cadastrar novo curso</a>
+	<br>
+	<a href="../index.html">Menu Principal</a> 
+	<style>  
+	.tabela, th, td{
+    border-collapse:collapse;
+    padding: 10px;
+    text-align: left;
+     }
+	 </style>
+	</body>
+</html>
+[20/11 10:27] Arthur Rosal: <!DOCTYPE html>
+<!-- insercao_aluno.php -->
+<html lang="pt-br">
+	<head>
+	  <title>Cadastro de aluno - Inclusão</title>
+	  <meta charset="utf-8">
+	</head>
+	<body>
+<?php 
+// efetua inclusao do aluno informado em cadastro_aluno.php
+
+  $curso = $_GET["ds_curso"];
+  $carga = $_GET["nr_carga_horaria"];
+  $date = $_GET["dt_inicio"];
+  
+  include_once "../inc/conectabd.inc.php";
+  $query = "INSERT INTO tb_curso 
+            (ds_curso,nr_carga_horaria,dt_inicio)
+	    VALUES
+            ('$curso',$carga,$date)";
+  if ($result = mysqli_query($link, $query)) {
+	  echo "Inclusão efetuada com sucesso";
+  }
+  
+  // fecha a conexão
+  mysqli_close($link);
+?>  
+ <br>
+ <a href="consulta_curso.php">Ver alunos cadastrados</a>
+ 
+ </body>
+</html>
+[20/11 10:27] Arthur Rosal: function recupera_curso($id){
+
+
+    global $link;
+    // lista cursos já cadastrados
+    $query = "SELECT id_curso, ds_curso, nr_carga_horaria, dt_inicio FROM tb_curso WHERE id_curso = $id;";
+    if ($result = mysqli_query($link, $query)) {
+         // busca os dados lidos do banco de dados
+      while ($row = mysqli_fetch_assoc($result)) {
+                  return $row;
+            }
+           
+          
+      // libera a área de memória onde está o resultado
+      mysqli_free_result($result);
+    }
+
+  }
+  }
